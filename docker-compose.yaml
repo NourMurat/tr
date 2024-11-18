@@ -1,0 +1,28 @@
+#ft_transcendence/docker-compose.yml
+    version: '3.8'
+
+    services:
+    db:
+        image: postgres:15.4
+        container_name: postgres_db
+        environment:
+        POSTGRES_USER: user
+        POSTGRES_PASSWORD: password
+        POSTGRES_DB: ft_transcendence
+        ports:
+        - "5432:5432"
+        volumes:
+        - postgres_data:/var/lib/postgresql/data
+
+    nginx:
+        image: nginx:1.24.0
+        container_name: nginx_proxy
+        ports:
+        - "80:80"
+        volumes:
+        - ./services/nginx:/etc/nginx/conf.d
+        depends_on:
+        - db
+
+    volumes:
+    postgres_data:
