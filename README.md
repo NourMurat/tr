@@ -27,8 +27,7 @@
 
 Откройте файл docker-compose.yml и добавьте базовую конфигурацию для базы данных и Nginx:
 
-#ft_transcendence/docker-compose.yml
-    
+    #ft_transcendence/docker-compose.yml
     version: '3.8'
 
     services:
@@ -57,24 +56,19 @@
     volumes:
     postgres_data:
 
-Добавим базовый конфигурационный файл. В папке services/nginx создайте файл конфигурации default.conf:
+Добавим базовый конфигурационный файл. В папке services/waf создайте файл конфигурации default.conf:
 
-#ft_transcendence/services/nginx/default.conf
-server {
-    listen 80;
+    #ft_transcendence/services/waf/default.conf
+    server {
+        listen 80;
 
-    server_name localhost;
+        server_name localhost;
 
-    location / {
-        return 200 'Welcome to ft_transcendence!';
-        add_header Content-Type text/plain;
+        location / {
+            return 200 'Welcome to ft_transcendence!';
+            add_header Content-Type text/plain;
+        }
     }
-
-    location /db-health {
-        default_type text/plain;
-        return 200 'Database is up!';
-    }
-}
 
 Проверка Docker Compose
 В корне проекта выполните:
@@ -85,7 +79,7 @@ server {
 
     docker ps
 
-Вы должны увидеть контейнеры postgres_db и nginx_proxy в состоянии UP.
+Вы должны увидеть контейнеры postgres_db и waf_service в состоянии UP.
 
 Проверочные тесты
 1.База данных (PostgreSQL):
@@ -118,7 +112,7 @@ server {
 
 Проверьте, что конфигурация Nginx активна:
 
-    docker exec -it nginx_proxy nginx -t
+    docker exec -it waf_service nginx -t
 
 Если конфигурация корректна, команда покажет - syntax is ok.
 
@@ -143,9 +137,7 @@ server {
 Цель
 Настроить базовый тестовый API-эндпоинт через Nginx, чтобы проверить маршрутизацию будущих микросервисов. Это создаст основу для добавления других сервисов (например, аутентификации, игровых данных и профилей пользователей).
 
-Откройте файл services/nginx/default.conf. Добавьте тестовый маршрут /api/test:
-
-#ft_transcendence/services/nginx/default.conf
+Откройте файл services/waf/default.conf. Добавьте тестовый маршрут /api/test:
 
     location /api/test {
         return 200 '{"message": "API is working"}';
@@ -164,7 +156,7 @@ server {
     {"message": "API is working"}
 
 Убедитесь, что конфигурация синтаксически корректна:
-    docker exec -it nginx_proxy nginx -t
+    docker exec -it waf_service nginx -t
 
 Если все корректно, значит тестовый API-эндпоинт /api/test успешно настроен и возвращает корректный JSON, базовая маршрутизация готова для добавления микросервисов.
 
@@ -179,8 +171,5 @@ server {
 2. Шаги выполнения
 2.1. Создание структуры микросервиса
 В папке services/auth создайте файл Dockerfile:
-
-
-
 
 

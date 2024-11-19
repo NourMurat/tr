@@ -23,5 +23,16 @@ services:
     depends_on:
       - db
 
+  auth:
+      build:
+        context: ./services/auth
+      container_name: auth_service
+      ports:
+        - "8000:8000"
+      volumes:
+        - ./services/auth:/app
+      depends_on:
+        - db
+
 volumes:
   postgres_data:

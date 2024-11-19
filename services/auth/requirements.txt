@@ -1,0 +1,3 @@
+#ft_transcendence/services/auth/requirements.txt
+django==4.2
+psycopg2-binary
