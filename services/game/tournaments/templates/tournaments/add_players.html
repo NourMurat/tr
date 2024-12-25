@@ -1,7 +1,22 @@
-<h1>Add Players to {{ tournament.name }}</h1>
-<p>{{ tournament.players.count }} / {{ tournament.participants }} players added</p>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Add Player</button>
-</form>
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Players</title>
+    <link rel="stylesheet" href="{% static 'tournaments/css/styles.css' %}">
+</head>
+<body>
+    <h1>Add Players</h1>
+    <form method="post" action="{% url 'tournaments:add_players' tournament_id=tournament.id %}">
+        {% csrf_token %}
+        {% for i in range %}
+        <label for="nickname_{{ i }}">Player {{ i|add:"1" }}:</label>
+        <input type="text" id="nickname_{{ i }}" name="nickname_{{ i }}" required>
+        {% endfor %}
+        <button type="submit">Go!</button>
+    </form>
+</body>
+</html>
