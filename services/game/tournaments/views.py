@@ -70,10 +70,18 @@ def view_tournament(request, tournament_id):
     }
     return render(request, 'tournaments/view_tournament.html', context)
 
-from django.shortcuts import redirect
+# start match
+from django.shortcuts import get_object_or_404, redirect
+from .models import Match
 
 def start_match(request, match_id):
     match = get_object_or_404(Match, id=match_id)
-    # Логика начала матча (например, переход на страницу игры)
+    if request.method == 'POST':
+        # Отметить матч как завершенный и установить результаты
+        match.is_complete = True
+        match.score_player1 = 3  # Пример результата
+        match.score_player2 = 2
+        match.winner = match.player1  # Установить победителя
+        match.save()
     return redirect('tournaments:view_tournament', tournament_id=match.tournament.id)
 
