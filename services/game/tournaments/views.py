@@ -62,11 +62,30 @@ def view_tournament(request, tournament_id):
     # Получаем все матчи турнира
     matches = tournament.matches.all()
 
+    
+    # Очки игроков
+    player_scores = {player: player.get_score() for player in players}
+
+    # Статус турнира
+    status = tournament.get_status()
+
+    # Проверяем, завершены ли все матчи
+    if status == "(completed)":
+        # Проверяем, нужен ли дополнительный турнир
+        if not Match.objects.filter(tournament=tournament, is_complete=False).exists():
+            create_additional_matches(tournament)
+
+    # Победитель
+    winner = tournament.get_winner()
+
     # Формируем данные для отображения
     context = {
         'tournament': tournament,
         'players': players,
+        'player_scores': player_scores,
         'matches': matches,
+        'status': status,
+        'winner': winner,
     }
     return render(request, 'tournaments/view_tournament.html', context)
 
@@ -84,4 +103,29 @@ def start_match(request, match_id):
         match.winner = match.player1  # Установить победителя
         match.save()
     return redirect('tournaments:view_tournament', tournament_id=match.tournament.id)
+
+
+# Логика для создания и отображения дополнительных матчей
+def create_additional_matches(tournament):
+    players = tournament.players.all()
+    max_score = max(player.get_score() for player in players)
+    top_players = [player for player in players if player.get_score() == max_score]
+
+    # Если два игрока, создаем один матч
+    if len(top_players) == 2:
+        Match.objects.create(
+            tournament=tournament,
+            player1=top_players[0],
+            player2=top_players[1],
+        )
+
+    # Если три и более, создаем круговой турнир
+    elif len(top_players) > 2:
+        from itertools import combinations
+        for player1, player2 in combinations(top_players, 2):
+            Match.objects.create(
+                tournament=tournament,
+                player1=player1,
+                player2=player2,
+            )
 

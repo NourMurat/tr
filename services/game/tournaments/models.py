@@ -5,12 +5,38 @@ class Tournament(models.Model):
     participants_count = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def get_status(self):
+        matches = self.matches.all()
+        if matches.filter(is_complete=False).exists():
+            return "Incomplete"
+        return "Complete"
+
+    def get_winner(self):
+        # Проверяем, завершены ли все матчи
+        if self.matches.filter(is_complete=False).exists():
+            return None  # Победитель не определен, если есть незавершенные матчи
+
+        players = self.players.all()
+        max_score = max(player.get_score() for player in players)
+        top_players = [player for player in players if player.get_score() == max_score]
+
+        if len(top_players) == 1:
+            return top_players[0]  # Возвращаем победителя, если он один
+        return None  # Победитель не определен, если требуется дополнительный турнир
+
     # def __str__(self):
     #     return self.name
 
 class Player(models.Model):
-    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name="players")
+    tournament = models.ForeignKey('Tournament', on_delete=models.CASCADE, related_name='players')
     nickname = models.CharField(max_length=50, unique=True)
+
+    def get_score(self):
+        # Подсчет побед игрока
+        return Match.objects.filter(winner=self).count()
+
+    def __str__(self):
+        return f"{self.nickname} ({self.get_score()} очков)"
 
     # def __str__(self):
     #     return self.nickname
@@ -28,5 +54,3 @@ class Match(models.Model):
         return f"{self.player1.nickname} vs {self.player2.nickname}"
 
 
-    # def __str__(self):
-    #     return f"{self.player1.nickname} vs {self.player2.nickname}"
