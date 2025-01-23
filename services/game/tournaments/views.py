@@ -2,6 +2,7 @@
 
 from django.shortcuts import render, redirect
 from .models import Tournament
+# from  pong import templates
 
 def create_tournament(request):
     if request.method == 'POST':
@@ -24,7 +25,8 @@ def add_players(request, tournament_id):
         nicknames = []
         for i in range(tournament.participants_count):
             nickname = request.POST[f'nickname_{i}']
-            if nickname in nicknames or Player.objects.filter(nickname=nickname).exists():
+            if nickname in nicknames:
+            # if nickname in nicknames or Player.objects.filter(nickname=nickname).exists():
                 return render(request, 'tournaments/add_players.html', {
                     'tournament': tournament,
                     'range': range(tournament.participants_count),

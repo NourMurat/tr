@@ -15,7 +15,7 @@ Create the following folder structure locally:
     ft_transcendence/
     ├── Makefile
     ├── README.md
-    ├── docker-compose.yaml
+    ├── docker-compose.yml
     └── services/
         ├── auth/
         ├── user/
