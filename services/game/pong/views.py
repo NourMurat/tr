@@ -8,4 +8,4 @@ def game_view(request):
     # Get match details
     
     # Render inside game.html
-    return render(request, 'pong/game.html', {'match_details': match_details})
+    return render(request, 'pong/game.html')

@@ -37,12 +37,15 @@
                     -
                 {% endif %}
             </td>
-            <td>
+            <td style="align-items: center;">
                 {% if not match.is_complete %}
                 <form method="post" action="{% url 'tournaments:start_match' match.id %}">
                     {% csrf_token %}
                     <button type="submit">Start Match</button>
                 </form>
+                {% endif %}
+                {% if match.is_complete %}
+                    <span style="color:green; font-size: large;"> Finished</span>
                 {% endif %}
             </td>
         </tr>

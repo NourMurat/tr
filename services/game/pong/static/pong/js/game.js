@@ -4,10 +4,44 @@ let scene, camera, renderer;
 let table, ball, paddle1, paddle2, net;
 let ballVelocity = new THREE.Vector3(0.06, 0, 0.03);
 let score = {player1: 0, player2: 0};
-let maxScore = 5; // Максимальный счёт для завершения игры
+let maxScore = 1; // Максимальный счёт для завершения игры
 let gameStarted = false;
-
+let game_id = window.location.href.split('match/').reverse()[0].slice(0, 2);
+let player1, player2, score_player1, score_player2, winner, is_complete, tournamentStatus;
+console.log(game_id);
+async function fetchMatchDetails() {
+    try {
+      const response = await fetch(`http://localhost:5000/tournaments/${game_id}/details`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      // Assign fetched data to global variables
+      player1 = data.player1;
+      player2 = data.player2;
+      score_player1 = data.score_player1;
+      score_player2 = data.score_player2;
+      winner = data.winner;
+      is_complete = data.is_complete;
+  
+      updateGameUI();
+    } catch (error) {
+      console.error('Async fetch error:', error);
+    }
+  }
+  
+  // Call the async function
+  fetchMatchDetails();
+  
+  
+  function updateGameUI() {
+    // Use the global variables safely here
+    console.log('player1:', player1);
+    console.log('player2:', player2);
+  }
+  
 function init() {
+    
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0a0a0a);
 
@@ -146,41 +180,93 @@ function displayWinner() {
     winnerMessage.style.textAlign = 'center';
     winnerMessage.style.textShadow = '0 0 10px #ff00aa66';
     winnerMessage.textContent = `${winner} Wins!`;
+    console.log(tournamentStatus);
 
-    const restartButton = document.createElement('button');
-    restartButton.textContent = 'Restart Game';
-    restartButton.id = 'restartButton';
-    restartButton.style.position = 'absolute';
-    restartButton.style.top = '55%'; // Кнопка ниже надписи
-    restartButton.style.left = '50%';
-    restartButton.style.transform = 'translate(-50%, -50%)';
-    restartButton.style.fontSize = '24px';
-    restartButton.style.color = '#00ccff';
-    restartButton.style.background = 'transparent';
-    restartButton.style.border = '2px solid #00ccff';
-    restartButton.style.padding = '10px 20px';
-    restartButton.style.cursor = 'pointer';
-    restartButton.style.transition = 'all 0.3s ease';
-    restartButton.style.fontFamily = 'Orbitron, sans-serif';
-    restartButton.style.textTransform = 'uppercase';
-    restartButton.style.letterSpacing = '2px';
-    restartButton.style.boxShadow = '0 0 10px #00ccff66';
+    if (tournamentStatus) {
+        const redirectButton = document.createElement('button');
+        redirectButton.textContent = 'Go to tournament';
+        redirectButton.id = 'redirectButton';
+        redirectButton.style.position = 'absolute';
+        redirectButton.style.top = '55%'; // Кнопка ниже надписи
+        redirectButton.style.left = '50%';
+        redirectButton.style.transform = 'translate(-50%, -50%)';
+        redirectButton.style.fontSize = '24px';
+        redirectButton.style.color = '#00ccff';
+        redirectButton.style.background = 'transparent';
+        redirectButton.style.border = '2px solid #00ccff';
+        redirectButton.style.padding = '10px 20px';
+        redirectButton.style.cursor = 'pointer';
+        redirectButton.style.transition = 'all 0.3s ease';
+        redirectButton.style.fontFamily = 'Orbitron, sans-serif';
+        redirectButton.style.textTransform = 'uppercase';
+        redirectButton.style.letterSpacing = '2px';
+        redirectButton.style.boxShadow = '0 0 10px #00ccff66';
+        document.body.appendChild(redirectButton);
+        // fetch post request to update tournament status with details using game id
+        // fetch(`/tournaments/${game_id}/update`, {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify({
+        //         status: 'completed',
+        //         winner: winner,
+        //         score: score,
+        //         player1: player1,
+        //         player2: player2,
+        //         score_player1
+        //         score_player2
+        //         winner
+        //         is_complete
+        //     })
+        // })
+        // .then(response => response.json())
+        // .then(data => {
+        //     console.log('Success:', data);
+        // })
+        // .catch((error) => {
+        //     console.error('Error:', error);
+        // }
+        // );
+        redirectButton.addEventListener('click', () => {
+            window.location.href = `http://localhost:5000/tournaments/9`;
+        });
 
-    restartButton.addEventListener('click', () => {
-    score.player1 = 0;
-    score.player2 = 0;
-    updateScore();
-    winnerMessage.remove();
-    restartButton.remove(); // Удаляем кнопку из DOM
-    gameStarted = true; // Запускаем игру
-    resetBall(); // Перезапускаем мяч
-});
+    }else{
+       
+        const restartButton = document.createElement('button');
+        restartButton.textContent = 'Restart Game';
+        restartButton.id = 'restartButton';
+        restartButton.style.position = 'absolute';
+        restartButton.style.top = '55%'; // Кнопка ниже надписи
+        restartButton.style.left = '50%';
+        restartButton.style.transform = 'translate(-50%, -50%)';
+        restartButton.style.fontSize = '24px';
+        restartButton.style.color = '#00ccff';
+        restartButton.style.background = 'transparent';
+        restartButton.style.border = '2px solid #00ccff';
+        restartButton.style.padding = '10px 20px';
+        restartButton.style.cursor = 'pointer';
+        restartButton.style.transition = 'all 0.3s ease';
+        restartButton.style.fontFamily = 'Orbitron, sans-serif';
+        restartButton.style.textTransform = 'uppercase';
+        restartButton.style.letterSpacing = '2px';
+        restartButton.style.boxShadow = '0 0 10px #00ccff66';
 
+        restartButton.addEventListener('click', () => {
+        score.player1 = 0;
+        score.player2 = 0;
+        updateScore();
+        winnerMessage.remove();
+        restartButton.remove(); // Удаляем кнопку из DOM
+        gameStarted = true; // Запускаем игру
+        resetBall(); // Перезапускаем мяч
+        });
+        document.body.appendChild(restartButton);
 
+    }
     document.body.appendChild(winnerMessage);
-    document.body.appendChild(restartButton);
 }
-
 
 function animate() {
     requestAnimationFrame(animate);

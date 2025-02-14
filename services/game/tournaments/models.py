@@ -103,5 +103,21 @@ class Match(models.Model):
     winner = models.ForeignKey('Player', null=True, blank=True, on_delete=models.SET_NULL, related_name='won_matches')
     is_complete = models.BooleanField(default=False)
 
+    @classmethod
+    def get_match_details(cls, match_id):
+        try:
+            match = cls.objects.get(id=match_id)
+        except cls.DoesNotExist:
+            return None  # You could also raise an exception or return an error dict
+
+        return {
+            'player1': match.player1.nickname,
+            'player2': match.player2.nickname,
+            'score_player1': match.score_player1,
+            'score_player2': match.score_player2,
+            'winner': match.winner.nickname if match.winner else None,
+            'is_complete': match.is_complete
+        }
+
     def __str__(self):
         return f"{self.player1.nickname} vs {self.player2.nickname}"

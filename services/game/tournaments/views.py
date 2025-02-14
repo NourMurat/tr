@@ -2,6 +2,8 @@
 
 from django.shortcuts import render, redirect
 from .models import Tournament
+from django.http import JsonResponse
+
 # from  pong import templates
 
 def create_tournament(request):
@@ -63,8 +65,10 @@ def view_tournament(request, tournament_id):
 
     # Получаем все матчи турнира
     matches = tournament.matches.all()
+    # get match details
+    # matche = Match.objects.all()
+    # print(matche)
 
-    
     # Очки игроков
     player_scores = {player: player.get_score() for player in players}
 
@@ -96,15 +100,15 @@ from django.shortcuts import get_object_or_404, redirect
 from .models import Match
 
 def start_match(request, match_id):
+#redirect to game page with match_id
     match = get_object_or_404(Match, id=match_id)
-    if request.method == 'POST':
-        # Отметить матч как завершенный и установить результаты
-        match.is_complete = True
-        match.score_player1 = 3  # Пример результата
-        match.score_player2 = 2
-        match.winner = match.player1  # Установить победителя
-        match.save()
-    return redirect('tournaments:view_tournament', tournament_id=match.tournament.id)
+    match.is_complete = False
+    match.save()
+
+#    return render(request, 'pong/game.html') with match_id
+    # return redirect('pong', match_id=match.id)
+    return render(request, 'pong/game.html', {'match_id': match.id})
+    # return redirect('tournaments:view_tournament', tournament_id=match.id)
 
 
 # Логика для создания и отображения дополнительных матчей
@@ -131,3 +135,18 @@ def create_additional_matches(tournament):
                 player2=player2,
             )
 
+def get_match_details(request, game_id):
+    # Retrieve the match; return a 404 error if it doesn't exist
+    match = get_object_or_404(Match, id=game_id)
+    
+    # Prepare the response dictionary
+    details = {
+        'player1': match.player1.nickname,
+        'player2': match.player2.nickname,
+        'score_player1': match.score_player1,
+        'score_player2': match.score_player2,
+        'winner': match.winner.nickname if match.winner else None,
+        'is_complete': match.is_complete
+    }
+    
+    return JsonResponse(details)
