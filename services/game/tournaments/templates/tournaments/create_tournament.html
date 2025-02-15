@@ -6,10 +6,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Tournament</title>
-    <link rel="stylesheet" href="{% static 'tournaments/css/styles.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'tournaments/css/create.css' %}">
 </head>
-<body>
-    <h1>Create Tournament</h1>
+<body class="container">
+    <h1 class="title">Create Tournament</h1>
     <form method="post" action="{% url 'tournaments:create_tournament' %}">
         {% csrf_token %}
         <label for="participants_count">Number of Participants (3-8):</label>
